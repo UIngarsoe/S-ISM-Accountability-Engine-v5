@@ -98,6 +98,8 @@ def profile_to_markdown(profile: Dict) -> str:
     md.append("---")
     md.append(f"Proof Hash: {generate_proof_hash(profile)}")
     md.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
+    def profile_to_markdown(profile: Dict) -> str:
+    # ... builds the md list ...
     return "
 ".join(md)
 
