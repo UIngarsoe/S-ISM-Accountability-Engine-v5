@@ -28,3 +28,52 @@ The SS'ISM Accountability Engine v5 is a Streamlit-based prototype application d
 ## Installation
 
 Ensure you have Python 3.7+ and [Streamlit](https://streamlit.io/) installed:
+pip install streamlit
+```
+
+Clone this repository:
+
+```
+git clone https://github.com/UIngarsoe/S-ISM-Accountability-Engine-v5.git
+cd S-ISM-Accountability-Engine-v5
+```
+
+Run the Streamlit app:
+
+```
+streamlit run streamlit_app.py
+```
+
+---
+
+## Usage
+
+- Use the Quick Actions panel to select tasks: view profile, create, import, or export JSON.
+- Edit selected profiles and add events or allegations from the sidebar.
+- Download reports in Markdown or JSON for further sharing or analysis.
+- Verify data integrity with generated proof hashes.
+
+---
+
+## Contributing
+
+Contributions and suggestions are welcomed. Please ensure that all added entries are supported by public-source evidence only. Avoid any content that might jeopardize civilian safety or operational secrecy.
+
+---
+
+## License
+
+This project is licensed under the [AGPL-3.0 License](https://www.gnu.org/licenses/agpl-3.0.html).
+
+---
+
+## Contact
+
+For questions or collaboration inquiries, please reach out to the author or open issues on GitHub.
+
+---
+
+_Last updated: November 2025_
+```
+
+
