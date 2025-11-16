@@ -108,7 +108,6 @@ def profile_to_markdown(profile: Dict) -> str:
     # (content building code)
     return "
 ".join(md)
-".join(md)
 
 
 # -----------------------------
