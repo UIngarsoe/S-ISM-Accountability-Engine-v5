@@ -98,47 +98,8 @@ def profile_to_markdown(profile: Dict) -> str:
     md.append("---")
     md.append(f"Proof Hash: {generate_proof_hash(profile)}")
     md.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
-    functions.fetch_url({
-urls: [
-"https://github.com/UIngarsoe/S-ISM-Accountability-Engine-v5/blob/16f6bb3d6e3c0020adb28bbce5324fdd0ce6dfcc/streamlit_app.py"
-]
-})
-def profile_to_markdown(profile: Dict) -> str:
-    md = [...]
-    # (content building code)
     return "
 ".join(md)
-def profile_to_markdown(profile: Dict) -> str:
-    md = [f"# Accountability Profile: {profile.get('name', 'Unknown')}", ""]
-    md.append(f"Summary: {profile.get('summary', '')}")
-    md.append("")
-    md.append("## Roles")
-    for r in profile.get('roles', []):
-        md.append(f"- {r}")
-    md.append("")
-    md.append("## Events")
-    for e in profile.get('events', []):
-        md.append(f"- {e.get('date', '?')}: {e.get('title', '')} — {e.get('description', '')}")
-        if e.get('sources'):
-            md.append(f"  - Sources: {', '.join(e.get('sources'))}")
-        md.append(f"  - Confidence: {e.get('confidence', 1)}")
-        md.append("")
-    md.append("## Allegations")
-    for a in profile.get('allegations', []):
-        md.append(f"- {a.get('text', '')}")
-        if a.get('sources'):
-            md.append(f"  - Sources: {', '.join(a.get('sources'))}")
-        md.append(f"  - Confidence: {a.get('confidence', 1)}")
-        md.append("")
-    md.append("## Legal Tags")
-    md.append(', '.join(profile.get('legal_tags', [])))
-    md.append("")
-    md.append("---")
-    md.append(f"Proof Hash: {generate_proof_hash(profile)}")
-    md.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
-    return "
-".join(md)
-
 
 # -----------------------------
 # App Layout
