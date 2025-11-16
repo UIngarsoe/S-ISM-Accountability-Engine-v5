@@ -98,7 +98,11 @@ def profile_to_markdown(profile: Dict) -> str:
     md.append("---")
     md.append(f"Proof Hash: {generate_proof_hash(profile)}")
     md.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
-    return "
+    functions.fetch_url({
+urls: [
+"https://github.com/UIngarsoe/S-ISM-Accountability-Engine-v5/blob/16f6bb3d6e3c0020adb28bbce5324fdd0ce6dfcc/streamlit_app.py"
+]
+})
 ".join(md)
 
 
