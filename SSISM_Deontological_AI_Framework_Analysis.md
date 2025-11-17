@@ -9,7 +9,7 @@ The SS'ISM Accountability Engine v5: A Deontological AI Framework for Ethical OS
 --------------------------------------------------------------------------------------
 
 """
-Authors: U Ingar Soe (Myanmar/Burma 🧘-engineer in exile), Gemini Pro (Google AI)
+Authors: U Ingar Soe (Myanmar/Burma 🧘🪄🤺-engineer in exile), Gemini Pro (Google AI)
 Date: November 17, 2025 (Initial Release & Analysis)
 Keywords: Deontological AI, Buddhist Ethics, Human Rights, OSINT, Streamlit, Groq, Cryptographic Proof, Ethical Firewall, Sīla, Samādhi, Insight, Safety, Ahiṃsā, Metta
 """
