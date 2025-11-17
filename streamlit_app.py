@@ -22,7 +22,7 @@ GROQ_API_KEY = st.secrets.get("GROQ_API_KEY", "")  # Put your free key in Secret
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Fallback model list (all free tier)
-MODELS = ["llama-3.1-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"]
+MODELS = ["llama-3.3-70b-versatile", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it"]
 
 # ----------------------------- SAMPLE DATA -----------------------------
 if "profiles" not in st.session_state:
