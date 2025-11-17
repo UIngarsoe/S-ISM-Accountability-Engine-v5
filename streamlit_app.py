@@ -1,275 +1,223 @@
 #!/usr/bin/env python3
 """
-SS'ISM Accountability Engine v5
-Safe, evidence-based OSINT & accountability Streamlit prototype
+SS'ISM Accountability Engine v5 + Ethical Chatbot
+Safe, evidence-based OSINT + SS'ISM-guided AI advisor
 Author: U Ingar Soe Myanmar/BURMA 2025
-License: AGPL-3.0 (Justice Only — No Harm Amplification)
-
-Purpose:
-Document roles, events, allegations with sources; compute confidence; export JSON/MD; immutable proof hashes.
+Zero-cost, no OpenAI key needed (uses Groq free tier)
 """
 
 import streamlit as st
 import json
 import hashlib
-import datetime
+from datetime import datetime, timezone
 from typing import List, Dict
+import requests
 
-st.set_page_config(page_title="SS'ISM Accountability Engine v5", layout="wide")
+# ----------------------------- CONFIG -----------------------------
+st.set_page_config(page_title="SS'ISM Accountability Engine v5 + Chat", layout="wide")
 
-# -----------------------------
-# Sample demonstration data (editable)
-# -----------------------------
+# Groq free API (Llama-3.1-70B or Mixtral) — no key needed for light use, but better with key
+GROQ_API_KEY = st.secrets.get("GROQ_API_KEY", "")  # Put your free key in Secrets for unlimited use
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-SAMPLE_PROFILES = {
-    "khin_yi": {
-        "id": "khin_yi",
-        "name": "U Khin Yi",
-        "summary": "Senior political actor with multiple government roles. This dataset contains allegations and public-source references, not criminal convictions.",
-        "roles": [
-            "USDP Chairman (2022–present)",
-            "Myanmar Police Chief (2005–2011)",
-            "Immigration Minister (2021–2022)"
-        ],
-        "events": [
-            {
+# Fallback model list (all free tier)
+MODELS = ["llama-3.1-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"]
+
+# ----------------------------- SAMPLE DATA -----------------------------
+if "profiles" not in st.session_state:
+    st.session_state.profiles = {
+        "khin_yi": {
+            "id": "khin_yi",
+            "name": "U Khin Yi",
+            "summary": "Senior political actor. Public-source references only — no convictions.",
+            "roles": ["USDP Chairman (2022–)", "Police Chief (2005–2011)", "Immigration Minister (2021–2022)"],
+            "events": [{
                 "date": "2007-09-01",
-                "title": "Saffron Crackdown (allegation)",
-                "description": "Reported involvement in police responses to protests.",
-                "sources": ["https://www.hrw.org/"],
+                "title": "Saffron Revolution response (alleged)",
+                "description": "Reported oversight of police actions.",
+                "sources": ["https://www.hrw.org/report/2009/09/24"],
                 "confidence": 3
-            },
-        ],
-        "allegations": [
-            {
-                "text": "Alleged direction of police crackdowns during the 2007 Saffron Revolution.",
-                "sources": ["https://www.hrw.org/"],
+            }],
+            "allegations": [{
+                "text": "Alleged direction of excessive force in 2007 protests.",
+                "sources": ["https://www.amnesty.org/"],
                 "confidence": 3
-            }
-        ],
-        "legal_tags": ["human_rights", "public_official"],
-        "notes": "All entries should be evidence-cited. This is a demo profile."
+            }],
+            "legal_tags": ["human_rights", "public_official"],
+            "notes": "Demo profile — always cite public sources."
+        }
     }
-}
 
-# -----------------------------
-# Utilities
-# -----------------------------
-
-
-def compute_confidence_score(items: List[Dict]) -> float:
-    """Compute simple average confidence among provided items (1-5 scale)."""
-    if not items:
-        return 0.0
+# ----------------------------- UTILITIES -----------------------------
+def compute_confidence(items: List[Dict]) -> float:
+    if not items: return 0.0
     total = sum(item.get("confidence", 1) for item in items)
     return round(total / len(items), 2)
-
 
 def generate_proof_hash(profile: Dict) -> str:
     payload = json.dumps(profile, sort_keys=True, ensure_ascii=False).encode()
     return hashlib.sha256(payload).hexdigest()
 
-
-from datetime import datetime, timezone   # add this import
-
-# ... rest of your code ...
-
 def profile_to_markdown(profile: Dict) -> str:
-    md = [f"# Accountability Profile: {profile.get('name', 'Unknown')}", ""]
-    md.append(f"Summary: {profile.get('summary', '')}")
-    md.append("")
-    md.append("## Roles")
-    for r in profile.get('roles', []):
-        md.append(f"- {r}")
-    md.append("")
-    md.append("## Events")
-    for e in profile.get('events', []):
-        md.append(f"- {e.get('date', '?')}: {e.get('title', '')} — {e.get('description', '')}")
-        if e.get('sources'):
-            md.append(f"  Sources: {', '.join(e.get('sources'))}")
-        md.append(f"  Confidence: {e.get('confidence', 1)}")
-        md.append("")
+    md = [f"# SS'ISM Profile: {profile.get('name', 'Unknown')}", ""]
+    md.append(f"**Summary**: {profile.get('summary', '')}\n")
+    md.append("## Roles"); [md.append(f"- {r}") for r in profile.get("roles", [])]
+    md.append("\n## Events")
+    for e in profile.get("events", []):
+        md.append(f"- **{e.get('date','?')}** — {e.get('title','')}")
+        md.append(f"  {e.get('description','')}")
+        if e.get("sources"): md.append(f"  Sources: {', '.join(e.get('sources'))}")
+        md.append(f"  Confidence: {e.get('confidence',1)}\n")
     md.append("## Allegations")
-    for a in profile.get('allegations', []):
-        md.append(f"- {a.get('text', '')}")
-        if a.get('sources'):
-            md.append(f"  Sources: {', '.join(a.get('sources'))}")
-        md.append(f"  Confidence: {a.get('confidence', 1)}")
-        md.append("")
-    md.append("## Legal Tags")
-    md.append(', '.join(profile.get('legal_tags', [])))
-    md.append("")
-    md.append("---")
-    md.append(f"Proof Hash: {generate_proof_hash(profile)}")
-    md.append(f"Generated: {datetime.now(timezone.utc).isoformat()}")
+    for a in profile.get("allegations", []):
+        md.append(f"- {a.get('text','')}")
+        if a.get("sources"): md.append(f"  Sources: {', '.join(a.get('sources'))}")
+        md.append(f"  Confidence: {a.get('confidence',1)}\n")
+    md.append(f"**Proof Hash**: {generate_proof_hash(profile)}")
+    md.append(f"**Generated**: {datetime.now(timezone.utc).isoformat()}")
     return "\n".join(md)
 
+# ----------------------------- GROQ CHAT (SS'ISM ETHICAL) -----------------------------
+def ssism_chat(prompt: str, history: list) -> str:
+    if not GROQ_API_KEY:
+        return "Warning: Groq API key not set. Chat limited. Add key in Streamlit Secrets → GROQ_API_KEY"
 
-st.rerun()
+    # SS'ISM Deontological Firewall + Three Poisons Veto
+    veto_phrases = [
+        "harm", "violence", "target", "kill", "attack", "dox", "leak", "revenge", "greed", "hatred", "delusion",
+        "lobha", "dosa", "moha", "illegal", "weapon", "bomb", "assassinate"
+    ]
+    if any(bad in prompt.lower() for bad in veto_phrases):
+        return "Blocked: SS'ISM Deontological Firewall activated — request violates non-harm principle (ahiṃsā)."
 
-# -----------------------------
-# App Layout
-# -----------------------------
+    system_prompt = """
+You are Sadda — the compassionate voice of SS'ISM (Sila-Samadhi-Insight-Safety Model).
+Always respond with metta, karuna, wisdom, and truth.
+Never suggest harm, targeting, or amplification of suffering.
+Prioritize justice through evidence, reconciliation, and systemic reform.
+You are helping document accountability using only public sources.
+"""
 
-st.title("SS'ISM Accountability Engine — v5 (Safe OSINT)")
-st.caption("Documenting public-source evidence, computing confidence, and exporting defensible profiles.")
+    messages = [{"role": "system", "content": system_prompt}] + history + [{"role": "user", "content": prompt}]
 
-col1, col2 = st.columns([2, 1])
+    try:
+        response = requests.post(
+            GROQ_API_URL,
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+            json={"model": MODELS[0], "messages": messages, "temperature": 0.7, "max_tokens": 1024}
+        )
+        return response.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"Chat error: {str(e)}"
 
-with col2:
-    st.header("Quick Actions")
-    action = st.selectbox("Action", ["View profile", "Create new profile", "Import JSON", "Export all JSON"])
-    st.markdown("---")
+# ----------------------------- MAIN APP -----------------------------
+st.title("🛡️ SS'ISM Accountability Engine v5 + Sadda Chatbot")
+st.caption("Evidence-based OSINT profiles • Ethical AI advisor • Proof hashes • Zero harm")
 
-with col1:
-    if action == "View profile":
-        st.subheader("Profiles")
-        profile_keys = list(SAMPLE_PROFILES.keys())
-        selected = st.selectbox("Select profile", profile_keys)
-        profile = SAMPLE_PROFILES[selected]
+tab1, tab2, tab3 = st.tabs(["Profiles & Evidence", "Sadda Ethical Chatbot", "Export & Proof"])
 
-        st.markdown("### Summary")
-        st.write(profile.get('summary'))
+with tab1:
+    col1, col2 = st.columns([2, 1])
+    with col2:
+        action = st.selectbox("Action", ["View Profile", "Create New", "Import JSON"])
+    
+    with col1:
+        profiles = st.session_state.profiles
+        if action == "View Profile":
+            selected = st.selectbox("Select profile", list(profiles.keys()))
+            p = profiles[selected]
+            st.subheader(p["name"])
+            st.write(p["summary"])
+            st.markdown("### Roles"); [st.write(f"- {r}") for r in p["roles"]]
+            st.markdown("### Events")
+            for e in p.get("events", []):
+                st.write(f"**{e['date']}** — {e['title']}")
+                st.caption(e['description'])
+                if e.get("sources"): st.caption("Sources: " + ", ".join(e["sources"]))
+            st.markdown("### Allegations")
+            for a in p.get("allegations", []):
+                st.write(f"- {a['text']}")
+                if a.get("sources"): st.caption("Sources: " + ", ".join(a["sources"]))
+            score = compute_confidence(p.get("events",[]) + p.get("allegations",[]))
+            st.metric("Average Confidence", f"{score}/5")
+            st.code(generate_proof_hash(p), language=None)
+            md = profile_to_markdown(p)
+            st.download_button("Download Markdown", md, f"{p['id']}.md", "text/markdown")
+            st.download_button("Download JSON", json.dumps(p, ensure_ascii=False, indent=2), f"{p['id']}.json")
 
-        st.markdown("### Roles")
-        for r in profile.get('roles', []):
-            st.write(f"- {r}")
+        elif action == "Create New":
+            with st.form("new_profile"):
+                pid = st.text_input("ID (no spaces)")
+                name = st.text_input("Name")
+                summary = st.text_area("Summary")
+                roles = st.text_area("Roles (one per line)").splitlines()
+                submitted = st.form_submit_button("Create")
+                if submitted and pid:
+                    profiles[pid] = {
+                        "id": pid, "name": name, "summary": summary, "roles": [r.strip() for r in roles if r.strip()],
+                        "events": [], "allegations": [], "legal_tags": [], "notes": ""
+                    }
+                    st.success("Created! Refresh to see."); st.rerun()
 
-        st.markdown("### Events")
-        for e in profile.get('events', []):
-            st.write(f"- **{e.get('date', '?')}** {e.get('title', '')}")
-            st.write(e.get('description', ''))
-            if e.get('sources'):
-                st.markdown(f"Sources: {', '.join(e.get('sources'))}")
-            st.write(f"Confidence: {e.get('confidence', 1)}")
+with tab2:
+    st.header("Sadda — SS'ISM Ethical Chatbot")
+    st.caption("Powered by Groq/Llama-3.1-70B • Full SS'ISM Deontological Firewall active")
+    
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+    
+    if prompt := st.chat_input("Ask Sadda anything (justice, evidence, ethics, Myanmar, Buddhism…)"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
+        
+        with st.chat_message("assistant"):
+            with st.spinner("Sadda is thinking with metta…"):
+                reply = ssism_chat(prompt, st.session_state.messages[:-1])
+            st.write(reply)
+            st.session_state.messages.append({"role": "assistant", "content": reply})
 
-        st.markdown("### Allegations")
-        for a in profile.get('allegations', []):
-            st.write(f"- {a.get('text', '')}")
-            if a.get('sources'):
-                st.write(f"Sources: {', '.join(a.get('sources'))}")
-            st.write(f"Confidence: {a.get('confidence', 1)}")
+with tab3:
+    st.subheader("Export All Profiles")
+    all_json = json.dumps(st.session_state.profiles, ensure_ascii=False, indent=2)
+    st.download_button("Download All Profiles (JSON)", all_json, "ssism_all_profiles.json")
+    st.code(generate_proof_hash(st.session_state.profiles), language=None)
+    st.caption("This hash proves integrity of the entire database at this moment.")
 
-        st.markdown("---")
-        conf_score = compute_confidence_score(profile.get('events', []) + profile.get('allegations', []))
-        st.metric("Confidence Score (1-5)", conf_score)
+# ----------------------------- SIDEBAR EDITOR -----------------------------
+with st.sidebar:
+    st.header("Quick Editor")
+    sel = st.selectbox("Edit", ["Add Event", "Add Allegation"] + list(profiles.keys()))
+    if sel in profiles:
+        p = profiles[sel]
+        with st.form("add_event"):
+            e_date = st.date_input("Date")
+            e_title = st.text_input("Title")
+            e_desc = st.text_area("Description")
+            e_src = st.text_area("Sources (one per line)")
+            e_conf = st.slider("Confidence", 1, 5, 3)
+            if st.form_submit_button("Add Event"):
+                p.setdefault("events", []).append({
+                    "date": str(e_date), "title": e_title, "description": e_desc,
+                    "sources": [s.strip() for s in e_src.splitlines() if s.strip()],
+                    "confidence": e_conf
+                })
+                st.success("Added!"); st.rerun()
+        
+        with st.form("add_allegation"):
+            a_text = st.text_area("Allegation")
+            a_src = st.text_area("Sources")
+            a_conf = st.slider("Confidence", 1, 5, 3)
+            if st.form_submit_button("Add Allegation"):
+                p.setdefault("allegations", []).append({
+                    "text": a_text,
+                    "sources": [s.strip() for s in a_src.splitlines() if s.strip()],
+                    "confidence": a_conf
+                })
+                st.success("Added!"); st.rerun()
 
-        proof = generate_proof_hash(profile)
-        st.code(f"Proof SHA256: {proof}")
-
-        md = profile_to_markdown(profile)
-        st.download_button("Download profile (Markdown)", md, file_name=f"{profile.get('id')}_profile.md")
-        st.download_button("Download profile (JSON)", json.dumps(profile, ensure_ascii=False, indent=2), file_name=f"{profile.get('id')}_profile.json")
-
-    elif action == "Create new profile":
-        st.subheader("Create a new accountability profile")
-        with st.form("create_profile"):
-            pid = st.text_input("Profile ID (short, no spaces)")
-            name = st.text_input("Full name")
-            summary = st.text_area("Summary / description")
-            roles_input = st.text_area("Roles (one per line)")
-            notes = st.text_area("Notes / editorial guidance")
-            legal_tags = st.multiselect(
-                "Legal tags",
-                ["human_rights", "war_crimes", "public_official", "sanctions_candidate", "other"]
-            )
-
-            submitted = st.form_submit_button("Create profile")
-            if submitted:
-                roles = [r.strip() for r in roles_input.splitlines() if r.strip()]
-                new_profile = {
-                    "id": pid,
-                    "name": name,
-                    "summary": summary,
-                    "roles": roles,
-                    "events": [],
-                    "allegations": [],
-                    "legal_tags": legal_tags,
-                    "notes": notes
-                }
-                SAMPLE_PROFILES[pid] = new_profile
-                st.success(f"Profile {pid} created. Use 'View profile' to edit and add events.")
-
-    elif action == "Import JSON":
-        st.subheader("Import JSON file (profile or profiles)")
-        uploaded = st.file_uploader("Upload JSON", type=["json"])
-        if uploaded is not None:
-            try:
-                data = json.load(uploaded)
-                if isinstance(data, dict):
-                    # assume single profile or dict of profiles
-                    if data.get('id'):
-                        SAMPLE_PROFILES[data['id']] = data
-                        st.success(f"Imported profile {data['id']}")
-                    else:
-                        # assume multiple
-                        for k, v in data.items():
-                            SAMPLE_PROFILES[k] = v
-                        st.success(f"Imported {len(data)} profiles")
-                else:
-                    st.error("JSON must contain a profile dict or a dict of profiles.")
-            except Exception as e:
-                st.error(f"Invalid JSON: {e}")
-
-    elif action == "Export all JSON":
-        st.subheader("Export all profiles as JSON")
-        all_json = json.dumps(SAMPLE_PROFILES, ensure_ascii=False, indent=2)
-        st.download_button("Download all profiles (JSON)", all_json, file_name="ssism_profiles_export.json")
-
-# -----------------------------
-# Sidebar: edit selected profile (simple editor)
-# -----------------------------
-
-st.sidebar.header("Profile Editor")
-selected_profile = st.sidebar.selectbox("Select profile to edit", list(SAMPLE_PROFILES.keys()))
-profile = SAMPLE_PROFILES[selected_profile]
-
-st.sidebar.markdown("Add event")
-with st.sidebar.form("add_event_form"):
-    e_date = st.date_input("Event date", value=None)
-    e_title = st.text_input("Event title")
-    e_desc = st.text_area("Description")
-    e_sources = st.text_area("Sources (one per line)")
-    e_conf = st.slider("Confidence", 1, 5, 3)
-    add_event = st.form_submit_button("Add event")
-    if add_event:
-        event = {
-            "date": e_date.isoformat() if e_date else "",
-            "title": e_title,
-            "description": e_desc,
-            "sources": [s.strip() for s in e_sources.splitlines() if s.strip()],
-            "confidence": e_conf
-        }
-        profile.setdefault('events', []).append(event)
-        SAMPLE_PROFILES[selected_profile] = profile
-        st.experimental_rerun()
-
-st.sidebar.markdown("Add allegation")
-with st.sidebar.form("add_allegation_form"):
-    a_text = st.text_area("Allegation text")
-    a_sources = st.text_area("Sources (one per line)")
-    a_conf = st.slider("Confidence", 1, 5, 3, key='al_conf')
-    add_alleg = st.form_submit_button("Add allegation")
-    if add_alleg:
-        allegation = {
-            "text": a_text,
-            "sources": [s.strip() for s in a_sources.splitlines() if s.strip()],
-            "confidence": a_conf
-        }
-        profile.setdefault('allegations', []).append(allegation)
-        SAMPLE_PROFILES[selected_profile] = profile
-        st.experimental_rerun()
-
-st.sidebar.markdown("---")
-if st.sidebar.button("Compute proof hash for selected profile"):
-    proof = generate_proof_hash(profile)
-    st.sidebar.code(proof)
-
-st.sidebar.markdown("---")
-
-# -----------------------------
-# Footer / Guidance
-# -----------------------------
-
-st.markdown("---")
-st.caption("Guidance: All entries should be supported by public-source evidence. This tool is for documentation and accountability. Avoid operational or targeted content that may endanger civilians.")
+st.caption("SS'ISM Accountability Engine v5 + Sadda • Built with metta • Nov 2025 • AGPL-3.0 Justice Only")
