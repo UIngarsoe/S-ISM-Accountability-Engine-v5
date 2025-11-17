@@ -70,6 +70,10 @@ def generate_proof_hash(profile: Dict) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+from datetime import datetime, timezone   # add this import
+
+# ... rest of your code ...
+
 def profile_to_markdown(profile: Dict) -> str:
     md = [f"# Accountability Profile: {profile.get('name', 'Unknown')}", ""]
     md.append(f"Summary: {profile.get('summary', '')}")
@@ -82,26 +86,29 @@ def profile_to_markdown(profile: Dict) -> str:
     for e in profile.get('events', []):
         md.append(f"- {e.get('date', '?')}: {e.get('title', '')} — {e.get('description', '')}")
         if e.get('sources'):
-            md.append(f"  - Sources: {', '.join(e.get('sources'))}")
-        md.append(f"  - Confidence: {e.get('confidence', 1)}")
+            md.append(f"  Sources: {', '.join(e.get('sources'))}")
+        md.append(f"  Confidence: {e.get('confidence', 1)}")
         md.append("")
     md.append("## Allegations")
     for a in profile.get('allegations', []):
         md.append(f"- {a.get('text', '')}")
         if a.get('sources'):
-            md.append(f"  - Sources: {', '.join(a.get('sources'))}")
-        md.append(f"  - Confidence: {a.get('confidence', 1)}")
+            md.append(f"  Sources: {', '.join(a.get('sources'))}")
+        md.append(f"  Confidence: {a.get('confidence', 1)}")
         md.append("")
     md.append("## Legal Tags")
     md.append(', '.join(profile.get('legal_tags', [])))
     md.append("")
     md.append("---")
     md.append(f"Proof Hash: {generate_proof_hash(profile)}")
-    md.append(f"Generated: {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
-    def profile_to_markdown(profile: Dict) -> str:
-    # ... builds the md list ...
-    return "
-".join(md)
+    md.append(f"Generated: {datetime.now(timezone.utc).isoformat()}")
+    return "\n".join(md)
+
+
+# In the sidebar forms, replace:
+st.experimental_rerun()
+# with:
+st.rerun()
 
 # -----------------------------
 # App Layout
