@@ -1,79 +1,72 @@
-# SS'ISM Accountability Engine v5
+# SS'ISM Accountability Engine v5 + Sadda Chatbot
 
-**Safe, evidence-based OSINT & accountability Streamlit prototype**
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://s-ism-accountability-engine-v5-hhxtgyfqzljwtpdfkmik8j.streamlit.app/)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 
-**Author:** U Ingar Soe (Myanmar/Burma)  
-**License:** AGPL-3.0 (Justice Only — No Harm Amplification)  
-**Year:** 2025
+**Live Permanent Demo** → https://s-ism-accountability-engine-v5-hhxtgyfqzljwtpdfkmik8j.streamlit.app/
 
----
+**The world’s first fully ethical, open-source, cryptographically verifiable human-rights accountability platform with a live AI advisor (Sadda) built on Buddhist deontological principles.**
 
-## Overview
-
-The SS'ISM Accountability Engine v5 is a Streamlit-based prototype application designed for documenting public-source evidence related to political and human rights accountability. It allows users to create profiles detailing actors' roles, events, and allegations, compute confidence scores based on evidence, and export these profiles for reporting and validation purposes.
-
----
-
-## Features
-
-- Create, view, and edit detailed accountability profiles.
-- Track roles, events, and allegations with supporting sources.
-- Compute confidence scores (scale 1-5) for documented items.
-- Export profiles as JSON or Markdown files.
-- Generate immutable SHA256 proof hashes for accountability transparency.
-- Simple, intuitive UI with sidebar editing and import/export capabilities.
+Author: **U Ingar Soe (ဦးအင်ဂါးစိုး)** – Myanmar/Burma monk-engineer in exile  
+Date: 17 November 2025  
+Location: Thailand  
 
 ---
 
-## Installation
+### What This Is
 
-Ensure you have Python 3.7+ and [Streamlit](https://streamlit.io/) installed:
-pip install streamlit
-```
+A zero-cost, tamper-evident documentation engine for public-source OSINT on human-rights actors in Myanmar and beyond, combined with **Sadda** – an unlimited ethical chatbot that refuses to amplify harm.
 
-Clone this repository:
+- Evidence-based profiles (roles, events, allegations)  
+- Confidence scoring + SHA-256 proof hashes  
+- Full Markdown/JSON export  
+- Sadda: Groq-powered Llama-3.3-70B with SS'ISM Deontological Firewall (blocks violence, hatred, delusion)  
+- Hosted forever for free on Streamlit Community Cloud  
 
-```
-git clone https://github.com/UIngarsoe/S-ISM-Accountability-Engine-v5.git
-cd S-ISM-Accountability-Engine-v5
-```
+**SS'ISM** = **Sīla • Samādhi • Insight • Safety Model**  
+(Ethics • Focus • Evidence • Non-Harm)
 
-Run the Streamlit app:
+---
 
-```
+### Live Features (as of 17 Nov 2025)
+
+| Tab                     | What You See                                                                 |
+|-------------------------|-------------------------------------------------------------------------------|
+| Profiles & Evidence     | View/create profiles, add sourced events/allegations, confidence scores      |
+| Sadda Ethical Chatbot   | Unlimited AI advisor (answers Myanmar history, justice, ethics in seconds)   |
+| Export & Proof          | Download entire database as JSON/MD with verifiable SHA-256 hash             |
+
+Example Sadda response (real, captured today):
+> “The Myanmar military (Tatmadaw) has been accused of serious human-rights abuses… Sources: UN, HRW, Amnesty, ICJ… Approach with empathy and commitment to peace.”
+
+---
+
+### Ethical Firewall – Hard-Coded Protection
+
+Sadda will **never** help with:
+- Targeting individuals  
+- Violence or revenge  
+- Doxxing or operational harm  
+- Greed, hatred, or delusion (the Three Poisons)
+
+Instead it redirects every conversation toward **evidence, reconciliation, and systemic reform**.
+
+---
+
+### Tech Stack (100 % Free & Immortal)
+
+- Streamlit (single-file Python app)  
+- Groq Cloud API (free tier → unlimited light use)  
+- Streamlit Community Cloud (permanent free hosting)  
+- SHA-256 cryptographic proof hashes  
+- `st.session_state` + JSON export for data  
+
+---
+
+### How to Run / Deploy
+
+```bash
+git clone https://github.com/ingar-soe/ssism-accountability-engine-v5.git
+cd ssism-accountability-engine-v5
 streamlit run streamlit_app.py
-```
-
----
-
-## Usage
-
-- Use the Quick Actions panel to select tasks: view profile, create, import, or export JSON.
-- Edit selected profiles and add events or allegations from the sidebar.
-- Download reports in Markdown or JSON for further sharing or analysis.
-- Verify data integrity with generated proof hashes.
-
----
-
-## Contributing
-
-Contributions and suggestions are welcomed. Please ensure that all added entries are supported by public-source evidence only. Avoid any content that might jeopardize civilian safety or operational secrecy.
-
----
-
-## License
-
-This project is licensed under the [AGPL-3.0 License](https://www.gnu.org/licenses/agpl-3.0.html).
-
----
-
-## Contact
-
-For questions or collaboration inquiries, please reach out to the author or open issues on GitHub.
-
----
-
-_Last updated: November 2025_
-```
-
-
