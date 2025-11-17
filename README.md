@@ -8,8 +8,8 @@ Live Permanent Demo** → https://s-ism-accountability-engine-v5-hhxtgyfqzljwtpd
 
 The world’s first fully ethical, open-source, cryptographically verifiable human-rights accountability platform with a live AI advisor (Sadda) built on Buddhist deontological principles.**
 
-Author: U Ingar Soe (ဦးအင်္ဂါစိုး) – Myanmar/Burma monk-engineer in exile  
-Date: 17 November 2025  
+Author: U Ingar Soe (ဦးအင်္ဂါစိုး) – Myanmar/Burma 🧘🪄🤺engineer in exile  
+Date: 17 November 202y5  
 Location: Thailand  
 
 ---
