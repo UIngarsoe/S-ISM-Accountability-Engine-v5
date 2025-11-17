@@ -105,9 +105,6 @@ def profile_to_markdown(profile: Dict) -> str:
     return "\n".join(md)
 
 
-# In the sidebar forms, replace:
-st.experimental_rerun()
-# with:
 st.rerun()
 
 # -----------------------------
